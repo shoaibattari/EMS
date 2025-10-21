@@ -6,9 +6,9 @@ export const registerStudent = async (req, res) => {
     const {
       campus,
       course,
-      favTime,
+      sectionTime,
       fullName,
-      guardianName,
+      fatherName,
       contact,
       email,
       cnic,
@@ -17,6 +17,10 @@ export const registerStudent = async (req, res) => {
       qualification,
       address,
       city,
+      institute,
+      communityCardNumber,
+      cast,
+      community,
     } = req.body;
     console.log(req.body, "reqqqq");
 
@@ -24,9 +28,9 @@ export const registerStudent = async (req, res) => {
     if (
       !campus ||
       !course ||
-      !favTime ||
+      !sectionTime ||
       !fullName ||
-      !guardianName ||
+      !fatherName ||
       !contact ||
       !email ||
       !cnic ||
@@ -34,7 +38,11 @@ export const registerStudent = async (req, res) => {
       !dob ||
       !qualification ||
       !address ||
-      !city
+      !city ||
+      !institute ||
+      !communityCardNumber ||
+      !cast ||
+      !community
     ) {
       return res
         .status(400)
@@ -44,9 +52,9 @@ export const registerStudent = async (req, res) => {
     const newStudent = await studentModel.create({
       campus,
       course,
-      favTime,
+      sectionTime,
       fullName,
-      guardianName,
+      fatherName,
       contact,
       email,
       cnic,
@@ -55,6 +63,10 @@ export const registerStudent = async (req, res) => {
       qualification,
       address,
       city,
+      institute,
+      communityCardNumber,
+      cast,
+      community,
       profileImage: req.file ? req.file.filename : null,
     });
 
@@ -98,13 +110,17 @@ export const exportStudentData = async (req, res) => {
     worksheet.columns = [
       { header: "Student ID", key: "studentId", width: 25 },
       { header: "Full Name", key: "fullName", width: 45 },
-      { header: "Guardian Name", key: "guardianName", width: 25 },
+      { header: "Father Name", key: "fatherName", width: 25 },
       { header: "Campus", key: "campus", width: 20 },
       { header: "Course", key: "course", width: 25 },
-      { header: "Favourite Time", key: "favTime", width: 25 },
+      { header: "Section Time", key: "sectionTime", width: 25 },
       { header: "Contact", key: "contact", width: 20 },
       { header: "Email", key: "email", width: 25 },
       { header: "CNIC", key: "cnic", width: 20 },
+      { header: "Institute", key: "institute", width: 20 },
+      { header: "community", key: "community", width: 20 },
+      { header: "cast", key: "cast", width: 20 },
+      { header: "Community Card Number", key: "communityCardNumber", width: 20 },
       { header: "Gender", key: "gender", width: 10 },
       { header: "Date of Birth", key: "dob", width: 15 },
       { header: "Qualification", key: "qualification", width: 20 },
