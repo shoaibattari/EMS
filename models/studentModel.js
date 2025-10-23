@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
+const { Schema } = mongoose;
 
-const studentSchema = new mongoose.Schema(
+const studentSchema = new Schema(
   {
-    campus: { type: String, required: true },
-    course: { type: String, required: true },
+    campus: { type: Schema.Types.ObjectId, ref: "Campus", required: true },
+    course: { type: Schema.Types.ObjectId, ref: "Course", required: true },
     sectionTime: { type: String, required: true },
     fullName: { type: String, required: true },
     fatherName: { type: String, required: true },

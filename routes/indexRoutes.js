@@ -4,6 +4,9 @@ import authRoutes from "./authRoutes.js";
 import volunteerRoutes from "./volunteerRoutes.js";
 import studentRoutes from "./studentRoutes.js";
 import participantRoutes from "./participantRoutes.js";
+import campusRoutes from "./campusRoutes.js";
+import courseRoutes from "./courseRoutes.js";
+import eventRoutes from "./eventRoutes.js";
 
 const router = express.Router();
 
@@ -12,5 +15,8 @@ router.use("/auth", authRoutes);
 router.use("/volunteer", volunteerRoutes);
 router.use("/student", studentRoutes);
 router.use("/participant", participantRoutes);
+router.use("/campus", campusRoutes);
+router.use("/course", courseRoutes);
+router.use("/event", eventRoutes);
 
 export default router;

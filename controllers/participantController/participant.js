@@ -76,7 +76,10 @@ export const registerParticipant = async (req, res) => {
 
 export const getAllParticipant = async (req, res) => {
   try {
-    const participants = await participantModel.find().sort({ createdAt: -1 });
+    const participants = await participantModel
+      .find()
+      .populate("event", "title date location")
+      .sort({ createdAt: -1 });
     res.status(200).json({
       message: "All participant fetched successfully",
       status: true,
@@ -89,7 +92,9 @@ export const getAllParticipant = async (req, res) => {
 
 export const exportParticipantData = async (req, res) => {
   try {
-    const participants = await participantModel.find();
+    const participants = await participantModel
+      .find()
+      .populate("event", "title date");
 
     if (participants.length === 0) {
       return res.status(200).json({

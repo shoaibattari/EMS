@@ -12,9 +12,23 @@ const userSchema = new Schema(
       unique: true,
     },
     password: { type: String, required: true },
-    userRole: { type: String, default: "user" },
+    userRole: {
+      type: String,
+      enum: [
+        "superAdmin",
+        "admin",
+        "eventCoordinator",
+        "volunteer",
+        "student",
+        "participant",
+        "user",
+      ],
+      default: "user",
+    },
+    event: { type: mongoose.Schema.Types.ObjectId, ref: "Event" },
+
     avatar: {
-      url:{ type: String, default: "" },
+      url: { type: String, default: "" },
       publicId: { type: String, default: "" },
     },
     gender: {

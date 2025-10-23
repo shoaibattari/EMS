@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
+const { Schema } = mongoose;
 
-const participantSchema = new mongoose.Schema(
+const participantSchema = new Schema(
   {
-    event: { type: String, required: true },
+    event: { type: Schema.Types.ObjectId, ref: "Event", required: true },
     fullName: { type: String, required: true },
     fatherName: { type: String, required: true },
     contact: { type: String, required: true },
