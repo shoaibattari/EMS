@@ -5,9 +5,16 @@ const courseSchema = new mongoose.Schema(
     courseId: { type: String, unique: true },
     name: { type: String, required: true },
     duration: { type: String, required: true },
-    category: { type: String, required: true },
-    male: { type: Boolean, default: false },
-    female: { type: Boolean, default: false },
+    status: {
+      type: String,
+      enum: ["Coming Soon", "Admission Open", "Admission Closed"],
+      required: false,
+    },
+    gender: {
+      type: String,
+      enum: ["Male", "Female", "Both"],
+      required: false,
+    },
     batch: { type: String, required: true },
     courseCampus: {
       type: mongoose.Schema.Types.ObjectId,
