@@ -4,7 +4,8 @@ import courseModel from "../../models/courseModel.js";
 // ✅ Register new course
 export const registerCourse = async (req, res) => {
   try {
-    const { name, duration, gender, batch, status, courseCampus } = req.body;
+    const { name, duration, gender, batch, status, courseCampus, category } =
+      req.body;
 
     // Validation
     if (!name || !duration || !gender || !status || !batch || !courseCampus) {
@@ -13,6 +14,13 @@ export const registerCourse = async (req, res) => {
         .json({ message: "Please fill all required fields", status: false });
     }
 
+    let formattedCategory = [];
+    if (category) {
+      if (Array.isArray(category)) formattedCategory = category;
+      else if (typeof category === "string") {
+        formattedCategory = category.split(",").map((c) => c.trim());
+      }
+    }
     const newCourse = await courseModel.create({
       name,
       duration,
@@ -20,6 +28,7 @@ export const registerCourse = async (req, res) => {
       batch,
       status,
       courseCampus,
+      category: formattedCategory,
     });
 
     res.status(201).json({
@@ -74,6 +83,7 @@ export const exportCourseData = async (req, res) => {
       { header: "Gender", key: "gender", width: 10 },
       { header: "Batch", key: "batch", width: 15 },
       { header: "Campus", key: "campusName", width: 30 },
+      { header: "Category", key: "category", width: 30 },
       { header: "Status", key: "status", width: 30 },
       { header: "Created At", key: "createdAt", width: 25 },
     ];
@@ -87,6 +97,7 @@ export const exportCourseData = async (req, res) => {
         batch: c.batch,
         status: c.status,
         campusName: c.courseCampus?.name || "N/A",
+        category: c.category?.join(", ") || "-",
         createdAt: c.createdAt.toLocaleString(),
       });
     });

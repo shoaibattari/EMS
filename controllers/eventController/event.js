@@ -10,28 +10,24 @@ export const registerEvent = async (req, res) => {
       duration,
       venue,
       description,
-      male,
-      female,
+      status,
+      gender,
       category,
       eventCampus,
     } = req.body;
 
     // Validation
-    if (
-      !name ||
-      !date ||
-      !duration ||
-      !venue ||
-      !description ||
-      !category ||
-      male === undefined ||
-      female === undefined ||
-      !eventCampus
-    ) {
+    if (!name || !date || !duration || !venue || !description || !eventCampus) {
       return res
         .status(400)
         .json({ message: "Please fill all required fields", status: false });
     }
+
+    const categoryArray = Array.isArray(category)
+      ? category
+      : category
+      ? category.split(",").map((c) => c.trim())
+      : [];
 
     const newEvent = await eventModel.create({
       name,
@@ -39,9 +35,9 @@ export const registerEvent = async (req, res) => {
       duration,
       venue,
       description,
-      category,
-      male,
-      female,
+      status,
+      category: categoryArray,
+      gender,
       eventCampus,
     });
 
@@ -98,6 +94,8 @@ export const exportEventData = async (req, res) => {
       { header: "Venue", key: "venue", width: 25 },
       { header: "Description", key: "description", width: 40 },
       { header: "Category", key: "category", width: 20 },
+      { header: "Gender", key: "gender", width: 10 },
+      { header: "Status", key: "status", width: 20 },
       { header: "Campus", key: "campusName", width: 25 },
       { header: "Created At", key: "createdAt", width: 25 },
     ];
@@ -110,7 +108,9 @@ export const exportEventData = async (req, res) => {
         duration: e.duration,
         venue: e.venue,
         description: e.description,
-        category: e.category,
+        category: Array.isArray(e.category) ? e.category.join(", ") : "--",
+        gender: e.gender || "Both",
+        status: e.status || "Coming Soon",
         campusName: e.eventCampus?.name || "N/A",
         createdAt: e.createdAt.toLocaleString(),
       });

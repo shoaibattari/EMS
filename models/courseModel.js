@@ -10,10 +10,14 @@ const courseSchema = new mongoose.Schema(
       enum: ["Coming Soon", "Admission Open", "Admission Closed"],
       required: false,
     },
+    category: {
+      type: [String],
+      default: [],
+    },
     gender: {
       type: String,
       enum: ["Male", "Female", "Both"],
-      required: false,
+      default: "Both",
     },
     batch: { type: String, required: true },
     courseCampus: {

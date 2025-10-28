@@ -8,9 +8,21 @@ const eventSchema = new mongoose.Schema(
     duration: { type: String, required: true },
     venue: { type: String, required: true },
     description: { type: String, required: true },
-    category: { type: String, required: true },
-    male: { type: Boolean, default: false },
-    female: { type: Boolean, default: false },
+    status: {
+      type: String,
+      enum: ["Coming Soon", "Registration Open", "Registration Closed"],
+      required: "Coming Soon",
+    },
+    category: { 
+      type: [String],
+      default: [],
+    },
+    gender: {
+      type: String,
+      enum: ["Male", "Female", "Both"],
+      default: "Both",
+    },
+
     eventCampus: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Campus",
