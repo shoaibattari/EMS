@@ -13,7 +13,7 @@ const eventSchema = new mongoose.Schema(
       enum: ["Coming Soon", "Registration Open", "Registration Closed"],
       required: "Coming Soon",
     },
-    category: { 
+    category: {
       type: [String],
       default: [],
     },
@@ -22,11 +22,9 @@ const eventSchema = new mongoose.Schema(
       enum: ["Male", "Female", "Both"],
       default: "Both",
     },
-
-    eventCampus: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Campus",
-      required: true,
+    fees: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }

@@ -4,11 +4,28 @@ import courseModel from "../../models/courseModel.js";
 // ✅ Register new course
 export const registerCourse = async (req, res) => {
   try {
-    const { name, duration, gender, batch, status, courseCampus, category } =
-      req.body;
+    const {
+      name,
+      duration,
+      gender,
+      batch,
+      status,
+      courseCampus,
+      fees,
+      section,
+      category,
+    } = req.body;
 
     // Validation
-    if (!name || !duration || !gender || !status || !batch || !courseCampus) {
+    if (
+      !name ||
+      !duration ||
+      !gender ||
+      !status ||
+      !batch ||
+      !courseCampus ||
+      !section
+    ) {
       return res
         .status(400)
         .json({ message: "Please fill all required fields", status: false });
@@ -28,6 +45,8 @@ export const registerCourse = async (req, res) => {
       batch,
       status,
       courseCampus,
+      fees,
+      section,
       category: formattedCategory,
     });
 
@@ -80,10 +99,12 @@ export const exportCourseData = async (req, res) => {
       { header: "Course ID", key: "courseId", width: 20 },
       { header: "Course Name", key: "name", width: 35 },
       { header: "Duration", key: "duration", width: 20 },
+      { header: "Section", key: "section", width: 20 },
       { header: "Gender", key: "gender", width: 10 },
       { header: "Batch", key: "batch", width: 15 },
       { header: "Campus", key: "campusName", width: 30 },
       { header: "Category", key: "category", width: 30 },
+      { header: "Fees", key: "fees", width: 15 },
       { header: "Status", key: "status", width: 30 },
       { header: "Created At", key: "createdAt", width: 25 },
     ];
@@ -95,9 +116,11 @@ export const exportCourseData = async (req, res) => {
         duration: c.duration,
         gender: c.gender,
         batch: c.batch,
+        section: c.section,
         status: c.status,
         campusName: c.courseCampus?.name || "N/A",
         category: c.category?.join(", ") || "-",
+        fees: c.fees && c.fees > 0 ? c.fees : "Free",
         createdAt: c.createdAt.toLocaleString(),
       });
     });

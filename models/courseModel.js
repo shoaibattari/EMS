@@ -5,6 +5,8 @@ const courseSchema = new mongoose.Schema(
     courseId: { type: String, unique: true },
     name: { type: String, required: true },
     duration: { type: String, required: true },
+    section: { type: String, required: true },
+    fees: { type: Number, default: 0 },
     status: {
       type: String,
       enum: ["Coming Soon", "Admission Open", "Admission Closed"],

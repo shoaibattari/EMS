@@ -13,11 +13,11 @@ export const registerEvent = async (req, res) => {
       status,
       gender,
       category,
-      eventCampus,
+      fees,
     } = req.body;
 
     // Validation
-    if (!name || !date || !duration || !venue || !description || !eventCampus) {
+    if (!name || !date || !duration || !venue || !description) {
       return res
         .status(400)
         .json({ message: "Please fill all required fields", status: false });
@@ -38,7 +38,7 @@ export const registerEvent = async (req, res) => {
       status,
       category: categoryArray,
       gender,
-      eventCampus,
+      fees: fees || 0,
     });
 
     res.status(201).json({
@@ -95,8 +95,8 @@ export const exportEventData = async (req, res) => {
       { header: "Description", key: "description", width: 40 },
       { header: "Category", key: "category", width: 20 },
       { header: "Gender", key: "gender", width: 10 },
+      { header: "Fees", key: "fees", width: 15 },
       { header: "Status", key: "status", width: 20 },
-      { header: "Campus", key: "campusName", width: 25 },
       { header: "Created At", key: "createdAt", width: 25 },
     ];
 
@@ -111,7 +111,7 @@ export const exportEventData = async (req, res) => {
         category: Array.isArray(e.category) ? e.category.join(", ") : "--",
         gender: e.gender || "Both",
         status: e.status || "Coming Soon",
-        campusName: e.eventCampus?.name || "N/A",
+        fees: e.fees === 0 ? "Free" : e.fees,
         createdAt: e.createdAt.toLocaleString(),
       });
     });
