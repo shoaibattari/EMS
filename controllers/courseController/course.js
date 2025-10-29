@@ -31,6 +31,19 @@ export const registerCourse = async (req, res) => {
         .json({ message: "Please fill all required fields", status: false });
     }
 
+    let formattedSection = [];
+    if (Array.isArray(section)) {
+      formattedSection = section.filter((s) => s.trim() !== "");
+    } else if (typeof section === "string") {
+      formattedSection = section.split(",").map((s) => s.trim());
+    }
+
+    if (formattedSection.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "At least one section is required", status: false });
+    }
+
     let formattedCategory = [];
     if (category) {
       if (Array.isArray(category)) formattedCategory = category;
@@ -46,7 +59,7 @@ export const registerCourse = async (req, res) => {
       status,
       courseCampus,
       fees,
-      section,
+      section: formattedSection,
       category: formattedCategory,
     });
 
@@ -116,7 +129,7 @@ export const exportCourseData = async (req, res) => {
         duration: c.duration,
         gender: c.gender,
         batch: c.batch,
-        section: c.section,
+        ection: Array.isArray(c.section) ? c.section.join(" | ") : c.section,
         status: c.status,
         campusName: c.courseCampus?.name || "N/A",
         category: c.category?.join(", ") || "-",

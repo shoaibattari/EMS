@@ -5,7 +5,14 @@ const courseSchema = new mongoose.Schema(
     courseId: { type: String, unique: true },
     name: { type: String, required: true },
     duration: { type: String, required: true },
-    section: { type: String, required: true },
+    section: {
+      type: [String],
+      required: true,
+      validate: {
+        validator: (v) => Array.isArray(v) && v.length > 0,
+        message: "At least one section is required",
+      },
+    },
     fees: { type: Number, default: 0 },
     status: {
       type: String,
