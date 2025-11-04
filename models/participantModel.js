@@ -4,6 +4,7 @@ const { Schema } = mongoose;
 const participantSchema = new Schema(
   {
     event: { type: Schema.Types.ObjectId, ref: "Event", required: true },
+    category: { type: String },
     fullName: { type: String, required: true },
     fatherName: { type: String, required: true },
     contact: { type: String, required: true },
@@ -20,6 +21,7 @@ const participantSchema = new Schema(
     city: { type: String, required: true },
     profileImage: { type: String },
     participantId: { type: String, unique: true },
+    isPaid: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

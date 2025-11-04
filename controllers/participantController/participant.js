@@ -5,6 +5,7 @@ export const registerParticipant = async (req, res) => {
   try {
     const {
       event,
+      category,
       fullName,
       fatherName,
       contact,
@@ -47,6 +48,7 @@ export const registerParticipant = async (req, res) => {
 
     const newParticipant = await participantModel.create({
       event,
+      category,
       fullName,
       fatherName,
       contact,
@@ -78,7 +80,7 @@ export const getAllParticipant = async (req, res) => {
   try {
     const participants = await participantModel
       .find()
-      .populate("event", "title date location")
+      .populate("event", "name date venue")
       .sort({ createdAt: -1 });
     res.status(200).json({
       message: "All participant fetched successfully",
@@ -108,9 +110,10 @@ export const exportParticipantData = async (req, res) => {
 
     worksheet.columns = [
       { header: "Participant ID", key: "participantId", width: 25 },
+      { header: "Event", key: "event", width: 25 },
+      { header: "Category", key: "category", width: 25 },
       { header: "Full Name", key: "fullName", width: 45 },
       { header: "Father Name", key: "fatherName", width: 25 },
-      { header: "Event", key: "event", width: 25 },
       { header: "Contact", key: "contact", width: 20 },
       { header: "Email", key: "email", width: 25 },
       { header: "CNIC", key: "cnic", width: 20 },
