@@ -96,7 +96,8 @@ export const exportParticipantData = async (req, res) => {
   try {
     const participants = await participantModel
       .find()
-      .populate("event", "title date");
+      .populate("event", "title date")
+      .populate("paymentUpdatedBy", "name");
 
     if (participants.length === 0) {
       return res.status(200).json({
@@ -130,12 +131,16 @@ export const exportParticipantData = async (req, res) => {
       { header: "Qualification", key: "qualification", width: 20 },
       { header: "City", key: "city", width: 15 },
       { header: "Address", key: "address", width: 30 },
+      { header: "Is Paid", key: "isPaid", width: 10 },
+      { header: "Payment Date", key: "paymentDate", width: 25 },
       { header: "Created At", key: "createdAt", width: 25 },
     ];
 
     participants.forEach((s) => {
       worksheet.addRow({
         ...s._doc,
+        paymentDate: p.paymentDate ? p.paymentDate.toLocaleString() : "",
+        paymentUpdatedBy: p.paymentUpdatedBy?.name || "",
         createdAt: s.createdAt.toLocaleString(),
       });
     });
@@ -159,5 +164,48 @@ export const exportParticipantData = async (req, res) => {
       message: error.message,
       status: false,
     });
+  }
+};
+
+export const statusPaymentUpdate = async (req, res) => {
+  try {
+    const { participantId } = req.params;
+    const { isPaid } = req.body;
+
+    if (typeof isPaid !== "boolean") {
+      return res.status(400).json({
+        message: "isPaid must be a boolean value",
+        status: false,
+      });
+    }
+
+    const updateData = { isPaid };
+
+    if (isPaid) {
+      updateData.paymentDate = new Date();
+      updateData.paymentUpdatedBy = req.user?._id || null;
+    } else {
+      updateData.paymentDate = null;
+      updateData.paymentUpdatedBy = null;
+    }
+
+    const updatedParticipant = await participantModel
+      .findByIdAndUpdate(participantId, updateData, { new: true })
+      .populate("paymentUpdatedBy", "name email userRole");
+
+    if (!updatedParticipant) {
+      return res.status(404).json({
+        message: "Participant not found",
+        status: false,
+      });
+    }
+
+    res.status(200).json({
+      message: "Payment status updated successfully",
+      status: true,
+      data: updatedParticipant,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message, status: false });
   }
 };
