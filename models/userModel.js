@@ -18,6 +18,7 @@ const userSchema = new Schema(
         "superAdmin",
         "admin",
         "eventCoordinator",
+        "areaCoordinator",
         "volunteer",
         "student",
         "participant",
