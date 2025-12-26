@@ -7,7 +7,11 @@ import connectDB from "./config/db.js";
 const app = express();
 const port = 3001;
 dotenv.config();
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "https://omj-swc.vercel.app"], // yahan 2 URLs allow hain
+  })
+);
 app.use(express.json()); // To parse JSON request bodies
 app.use(express.urlencoded({ extended: true }));
 
