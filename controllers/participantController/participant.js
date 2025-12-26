@@ -1,5 +1,8 @@
 import ExcelJS from "exceljs";
+import User from "../../models/userModel.js";
 import participantModel from "../../models/participantModel.js";
+
+import mongoose from "mongoose";
 
 export const registerParticipant = async (req, res) => {
   try {
@@ -21,7 +24,6 @@ export const registerParticipant = async (req, res) => {
       cast,
       community,
     } = req.body;
-    console.log(req.body, "reqqqq");
 
     // Validation
     if (
@@ -170,20 +172,17 @@ export const exportParticipantData = async (req, res) => {
 export const statusPaymentUpdate = async (req, res) => {
   try {
     const { participantId } = req.params;
-    const { isPaid } = req.body;
+    let { isPaid } = req.body;
 
-    if (typeof isPaid !== "boolean") {
-      return res.status(400).json({
-        message: "isPaid must be a boolean value",
-        status: false,
-      });
-    }
+    // Handle string "true"/"false" from frontend
+    const isPaidBoolean = isPaid === true || isPaid === "true";
+    const updateData = { isPaid: isPaidBoolean };
 
-    const updateData = { isPaid };
-
-    if (isPaid) {
+    if (isPaidBoolean) {
       updateData.paymentDate = new Date();
-      updateData.paymentUpdatedBy = req.user?._id || null;
+      updateData.paymentUpdatedBy = req.user?.id
+        ? new mongoose.Types.ObjectId(req.user.id)
+        : null;
     } else {
       updateData.paymentDate = null;
       updateData.paymentUpdatedBy = null;
@@ -206,6 +205,43 @@ export const statusPaymentUpdate = async (req, res) => {
       data: updatedParticipant,
     });
   } catch (error) {
+    console.error("statusPaymentUpdate Error:", error);
+    res.status(500).json({ message: error.message, status: false });
+  }
+};
+
+export const markAttendance = async (req, res) => {
+  try {
+    const { participantId } = req.params;
+    const { isAttend } = req.body; // true/false from frontend
+
+    if (typeof isAttend !== "boolean") {
+      return res.status(400).json({
+        message: "isAttend must be a boolean value",
+        status: false,
+      });
+    }
+
+    const updatedParticipant = await participantModel.findByIdAndUpdate(
+      participantId,
+      { isAttend },
+      { new: true }
+    );
+
+    if (!updatedParticipant) {
+      return res.status(404).json({
+        message: "Participant not found",
+        status: false,
+      });
+    }
+
+    res.status(200).json({
+      message: "Attendance updated successfully",
+      status: true,
+      data: updatedParticipant,
+    });
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error.message, status: false });
   }
 };

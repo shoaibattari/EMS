@@ -22,6 +22,7 @@ const participantSchema = new Schema(
     profileImage: { type: String },
     participantId: { type: String, unique: true },
     isPaid: { type: Boolean, default: false },
+    isAttend: { type: Boolean, default: false },
     paymentDate: { type: Date },
     paymentUpdatedBy: { type: Schema.Types.ObjectId, ref: "User" },
   },
