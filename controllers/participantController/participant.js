@@ -80,17 +80,55 @@ export const registerParticipant = async (req, res) => {
 
 export const getAllParticipant = async (req, res) => {
   try {
+    const { search, page = 1, limit = 10 } = req.query; // default page=1, limit=10
+    const pageNumber = parseInt(page, 10);
+    const pageSize = parseInt(limit, 10);
+
+    let query = {};
+
+    if (search) {
+      const searchRegex = new RegExp(search, "i"); // case-insensitive
+      query = {
+        $or: [
+          { participantId: searchRegex },
+          { fullName: searchRegex },
+          { fatherName: searchRegex },
+          { email: searchRegex },
+          { contact: searchRegex },
+          { cnic: searchRegex },
+          { community: searchRegex },
+          { cast: searchRegex },
+        ],
+      };
+    }
+
+    // Total count for pagination
+    const total = await participantModel.countDocuments(query);
+
+    // Fetch paginated data
     const participants = await participantModel
-      .find()
+      .find(query)
       .populate("event", "name date venue")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize);
+
     res.status(200).json({
-      message: "All participant fetched successfully",
+      message: "Participants fetched successfully",
       status: true,
       data: participants,
+      pagination: {
+        total,
+        page: pageNumber,
+        totalPages: Math.ceil(total / pageSize),
+        limit: pageSize,
+      },
     });
   } catch (error) {
-    res.status(500).json({ message: error.message, status: false });
+    res.status(500).json({
+      message: error.message,
+      status: false,
+    });
   }
 };
 
