@@ -9,7 +9,12 @@ const port = 3001;
 dotenv.config();
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://omj-swc.vercel.app"], // yahan 2 URLs allow hain
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "https://omj-youtube-automation-workshop.vercel.app",
+      "https://omj-swc.vercel.app",
+    ], // yahan 4 URLs allow hain
   })
 );
 app.use(express.json()); // To parse JSON request bodies

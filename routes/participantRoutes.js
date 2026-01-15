@@ -2,6 +2,7 @@ import express from "express";
 import {
   exportParticipantData,
   getAllParticipant,
+  getParticipantByQuery,
   markAttendance,
   registerParticipant,
   statusPaymentUpdate,
@@ -18,6 +19,7 @@ router.patch(
   verifyToken,
   statusPaymentUpdate
 );
+router.get("/find", getParticipantByQuery);
 
 router.patch("/:participantId/attendance", verifyToken, markAttendance);
 
