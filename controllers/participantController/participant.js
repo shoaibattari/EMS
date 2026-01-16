@@ -284,30 +284,32 @@ export const markAttendance = async (req, res) => {
   }
 };
 
-
 export const getParticipantByQuery = async (req, res) => {
   try {
-    const { query } = req.query; 
+    const { query } = req.query;
 
     if (!query) {
-      return res.status(400).json({ 
-        message: "Please provide CNIC, Mobile Number, or ID", 
-        status: false 
+      return res.status(400).json({
+        message: "Please provide CNIC, Mobile Number, or ID",
+        status: false,
       });
     }
 
     // $or operator ka use karke hum multiple unique fields check kar rahe hain
-    const participant = await participantModel.findOne({
-      $or: [
-        { contact: query },
-        { cnic: query },
-        { participantId: query } // Agar aap ID generate karte hain
-      ]
-    }).populate("event", "name date venue");
+    const participant = await participantModel
+      .find({
+        $or: [
+          { contact: query },
+          { cnic: query },
+          { participantId: query }, // Agar aap ID generate karte hain
+        ],
+      })
+      .populate("event", "name date venue");
 
-    if (!participant) {
+    if (!participant || participant.length === 0) {
       return res.status(404).json({
-        message: "Record not found. Please check your details or Register again.",
+        message:
+          "Record not found. Please check your details or Register again.",
         status: false,
       });
     }
