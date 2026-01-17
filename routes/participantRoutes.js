@@ -3,6 +3,7 @@ import {
   exportParticipantData,
   getAllParticipant,
   getParticipantByQuery,
+  getParticipantStats,
   markAttendance,
   registerParticipant,
   statusPaymentUpdate,
@@ -22,5 +23,7 @@ router.patch(
 router.get("/find", getParticipantByQuery);
 
 router.patch("/:participantId/attendance", verifyToken, markAttendance);
+
+router.get("/stats", verifyToken, getParticipantStats);
 
 export default router;

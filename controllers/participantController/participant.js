@@ -323,3 +323,56 @@ export const getParticipantByQuery = async (req, res) => {
     res.status(500).json({ message: error.message, status: false });
   }
 };
+
+export const getParticipantStats = async (req, res) => {
+  try {
+    const participants = await participantModel.find();
+
+    if (!participants || participants.length === 0) {
+      return res.status(200).json({
+        status: true,
+        message: "No participants found",
+        data: {},
+      });
+    }
+
+    const stats = {
+      total: participants.length,
+      gender: { male: 0, female: 0 },
+      paid: { total: 0, male: 0, female: 0 },
+      attendance: { total: 0, male: 0, female: 0 },
+    };
+
+    participants.forEach((p) => {
+      // Gender count
+      if (p.gender === "Male") stats.gender.male++;
+      else if (p.gender === "Female") stats.gender.female++;
+
+      // Paid count
+      if (p.isPaid) {
+        stats.paid.total++;
+        if (p.gender === "Male") stats.paid.male++;
+        else if (p.gender === "Female") stats.paid.female++;
+      }
+
+      // Attendance count
+      if (p.isAttend) {
+        stats.attendance.total++;
+        if (p.gender === "Male") stats.attendance.male++;
+        else if (p.gender === "Female") stats.attendance.female++;
+      }
+    });
+
+    res.status(200).json({
+      status: true,
+      message: "Participant stats fetched successfully",
+      data: stats,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      message: "Failed to fetch stats",
+      error: error.message,
+    });
+  }
+};
