@@ -31,17 +31,11 @@ export const registerParticipant = async (req, res) => {
       !fullName ||
       !fatherName ||
       !contact ||
-      !email ||
       !cnic ||
       !gender ||
       !dob ||
       !qualification ||
-      !address ||
-      !city ||
-      !institute ||
-      !communityCardNumber ||
-      !cast ||
-      !community
+      !address
     ) {
       return res
         .status(400)
