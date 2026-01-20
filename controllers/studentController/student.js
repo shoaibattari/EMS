@@ -31,18 +31,7 @@ export const registerStudent = async (req, res) => {
       !sectionTime ||
       !fullName ||
       !fatherName ||
-      !contact ||
-      !email ||
-      !cnic ||
-      !gender ||
-      !dob ||
-      !qualification ||
-      !address ||
-      !city ||
-      !institute ||
-      !communityCardNumber ||
-      !cast ||
-      !community
+      !contact
     ) {
       return res
         .status(400)
@@ -120,7 +109,11 @@ export const exportStudentData = async (req, res) => {
       { header: "Institute", key: "institute", width: 20 },
       { header: "community", key: "community", width: 20 },
       { header: "cast", key: "cast", width: 20 },
-      { header: "Community Card Number", key: "communityCardNumber", width: 20 },
+      {
+        header: "Community Card Number",
+        key: "communityCardNumber",
+        width: 20,
+      },
       { header: "Gender", key: "gender", width: 10 },
       { header: "Date of Birth", key: "dob", width: 15 },
       { header: "Qualification", key: "qualification", width: 20 },
