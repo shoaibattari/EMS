@@ -9,6 +9,15 @@ const upload = (folderName) => {
     params: {
       folder: folderName,
       allowed_formats: ["jpg", "jpeg", "png"],
+      transformation: [
+        {
+          width: 800,
+          height: 800,
+          crop: "limit",
+          quality: "auto",
+          fetch_format: "auto",
+        },
+      ],
     },
   });
 
