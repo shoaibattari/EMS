@@ -4,7 +4,7 @@ import {
   getAllStudents,
   registerStudent,
 } from "../controllers/studentController/student.js";
-import upload from "../middlewares/upload.js";
+import upload from "../middlewares/uploadMiddleware.js";
 
 const router = express.Router();
 
