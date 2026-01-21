@@ -20,8 +20,14 @@ const studentSchema = new Schema(
     institute: { type: String },
     address: { type: String },
     city: { type: String },
-    profileImage: { type: String },
-    paymentSlip: { type: String },
+    profileImage: {
+      url: { type: String, default: "" },
+      publicId: { type: String, default: "" },
+    },
+    paymentSlip: {
+      url: { type: String, default: "" },
+      publicId: { type: String, default: "" },
+    },
     studentId: { type: String, unique: true },
     isPaid: { type: Boolean, default: false },
     isAttend: { type: Boolean, default: false },

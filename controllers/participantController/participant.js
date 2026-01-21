@@ -1,9 +1,8 @@
 import ExcelJS from "exceljs";
-import User from "../../models/userModel.js";
+import mongoose from "mongoose";
 import participantModel from "../../models/participantModel.js";
 
-import mongoose from "mongoose";
-
+// Register Participant
 export const registerParticipant = async (req, res) => {
   try {
     const { event, fullName, fatherName, contact, gender, dob } = req.body;
@@ -18,8 +17,19 @@ export const registerParticipant = async (req, res) => {
 
     const newParticipant = await participantModel.create({
       ...req.body,
-      profileImage: req.file?.filename || null,
-      paymentSlip: req.file?.filename || null,
+      profileImage: req.files?.profileImage
+        ? {
+            url: req.files.profileImage[0].path,
+            publicId: req.files.profileImage[0].filename,
+          }
+        : undefined,
+
+      paymentSlip: req.files?.paymentSlip
+        ? {
+            url: req.files.paymentSlip[0].path,
+            publicId: req.files.paymentSlip[0].filename,
+          }
+        : undefined,
     });
 
     res.status(201).json({
@@ -28,6 +38,7 @@ export const registerParticipant = async (req, res) => {
       data: newParticipant,
     });
   } catch (error) {
+    console.error("registerParticipant Error:", error);
     res.status(500).json({
       message: error.message,
       status: false,
@@ -35,16 +46,17 @@ export const registerParticipant = async (req, res) => {
   }
 };
 
+// Get All Participants with Search & Pagination
 export const getAllParticipant = async (req, res) => {
   try {
-    const { search, page = 1, limit = 10 } = req.query; // default page=1, limit=10
+    const { search, page = 1, limit = 10 } = req.query;
     const pageNumber = parseInt(page, 10);
     const pageSize = parseInt(limit, 10);
 
     let query = {};
 
     if (search) {
-      const searchRegex = new RegExp(search, "i"); // case-insensitive
+      const searchRegex = new RegExp(search, "i");
       query = {
         $or: [
           { participantId: searchRegex },
@@ -59,10 +71,8 @@ export const getAllParticipant = async (req, res) => {
       };
     }
 
-    // Total count for pagination
     const total = await participantModel.countDocuments(query);
 
-    // Fetch paginated data
     const participants = await participantModel
       .find(query)
       .populate("event", "name date venue")
@@ -82,13 +92,12 @@ export const getAllParticipant = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-      status: false,
-    });
+    console.error("getAllParticipant Error:", error);
+    res.status(500).json({ message: error.message, status: false });
   }
 };
 
+// Export Participants to Excel
 export const exportParticipantData = async (req, res) => {
   try {
     const participants = await participantModel
@@ -96,7 +105,7 @@ export const exportParticipantData = async (req, res) => {
       .populate("event", "title date")
       .populate("paymentUpdatedBy", "name");
 
-    if (participants.length === 0) {
+    if (!participants.length) {
       return res.status(200).json({
         message: "No participants data found",
         status: false,
@@ -116,8 +125,8 @@ export const exportParticipantData = async (req, res) => {
       { header: "Email", key: "email", width: 25 },
       { header: "CNIC", key: "cnic", width: 20 },
       { header: "Institute", key: "institute", width: 20 },
-      { header: "community", key: "community", width: 20 },
-      { header: "cast", key: "cast", width: 20 },
+      { header: "Community", key: "community", width: 20 },
+      { header: "Cast", key: "cast", width: 20 },
       {
         header: "Community Card Number",
         key: "communityCardNumber",
@@ -130,15 +139,17 @@ export const exportParticipantData = async (req, res) => {
       { header: "Address", key: "address", width: 30 },
       { header: "Is Paid", key: "isPaid", width: 10 },
       { header: "Payment Date", key: "paymentDate", width: 25 },
+      { header: "Payment Updated By", key: "paymentUpdatedBy", width: 25 },
       { header: "Created At", key: "createdAt", width: 25 },
     ];
 
-    participants.forEach((s) => {
+    participants.forEach((p) => {
       worksheet.addRow({
-        ...s._doc,
+        ...p._doc,
+        event: p.event?.title || "",
         paymentDate: p.paymentDate ? p.paymentDate.toLocaleString() : "",
         paymentUpdatedBy: p.paymentUpdatedBy?.name || "",
-        createdAt: s.createdAt.toLocaleString(),
+        createdAt: p.createdAt.toLocaleString(),
       });
     });
 
@@ -157,19 +168,17 @@ export const exportParticipantData = async (req, res) => {
     await workbook.xlsx.write(res);
     res.end();
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-      status: false,
-    });
+    console.error("exportParticipantData Error:", error);
+    res.status(500).json({ message: error.message, status: false });
   }
 };
 
+// Update Payment Status
 export const statusPaymentUpdate = async (req, res) => {
   try {
     const { participantId } = req.params;
     let { isPaid } = req.body;
 
-    // Handle string "true"/"false" from frontend
     const isPaidBoolean = isPaid === true || isPaid === "true";
     const updateData = { isPaid: isPaidBoolean };
 
@@ -205,10 +214,11 @@ export const statusPaymentUpdate = async (req, res) => {
   }
 };
 
+// Mark Attendance
 export const markAttendance = async (req, res) => {
   try {
     const { participantId } = req.params;
-    const { isAttend } = req.body; // true/false from frontend
+    const { isAttend } = req.body;
 
     if (typeof isAttend !== "boolean") {
       return res.status(400).json({
@@ -236,11 +246,12 @@ export const markAttendance = async (req, res) => {
       data: updatedParticipant,
     });
   } catch (error) {
-    console.error(error);
+    console.error("markAttendance Error:", error);
     res.status(500).json({ message: error.message, status: false });
   }
 };
 
+// Get Participant by Query (CNIC, Contact, ID)
 export const getParticipantByQuery = async (req, res) => {
   try {
     const { query } = req.query;
@@ -252,18 +263,13 @@ export const getParticipantByQuery = async (req, res) => {
       });
     }
 
-    // $or operator ka use karke hum multiple unique fields check kar rahe hain
     const participant = await participantModel
       .find({
-        $or: [
-          { contact: query },
-          { cnic: query },
-          { participantId: query }, // Agar aap ID generate karte hain
-        ],
+        $or: [{ contact: query }, { cnic: query }, { participantId: query }],
       })
       .populate("event", "name date venue");
 
-    if (!participant || participant.length === 0) {
+    if (!participant.length) {
       return res.status(404).json({
         message:
           "Record not found. Please check your details or Register again.",
@@ -277,15 +283,17 @@ export const getParticipantByQuery = async (req, res) => {
       data: participant,
     });
   } catch (error) {
+    console.error("getParticipantByQuery Error:", error);
     res.status(500).json({ message: error.message, status: false });
   }
 };
 
+// Get Participant Statistics
 export const getParticipantStats = async (req, res) => {
   try {
     const participants = await participantModel.find();
 
-    if (!participants || participants.length === 0) {
+    if (!participants.length) {
       return res.status(200).json({
         status: true,
         message: "No participants found",
@@ -301,18 +309,15 @@ export const getParticipantStats = async (req, res) => {
     };
 
     participants.forEach((p) => {
-      // Gender count
       if (p.gender === "Male") stats.gender.male++;
       else if (p.gender === "Female") stats.gender.female++;
 
-      // Paid count
       if (p.isPaid) {
         stats.paid.total++;
         if (p.gender === "Male") stats.paid.male++;
         else if (p.gender === "Female") stats.paid.female++;
       }
 
-      // Attendance count
       if (p.isAttend) {
         stats.attendance.total++;
         if (p.gender === "Male") stats.attendance.male++;
@@ -326,6 +331,7 @@ export const getParticipantStats = async (req, res) => {
       data: stats,
     });
   } catch (error) {
+    console.error("getParticipantStats Error:", error);
     res.status(500).json({
       status: false,
       message: "Failed to fetch stats",
