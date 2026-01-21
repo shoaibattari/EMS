@@ -3,60 +3,25 @@ import studentModel from "../../models/studentModel.js";
 
 export const registerStudent = async (req, res) => {
   try {
-    const {
-      campus,
-      course,
-      sectionTime,
-      fullName,
-      fatherName,
-      contact,
-      email,
-      cnic,
-      gender,
-      dob,
-      qualification,
-      address,
-      city,
-      institute,
-      communityCardNumber,
-      cast,
-      community,
-    } = req.body;
-    console.log(req.body, "reqqqq");
-
-    // Validation
+    // basic required check
     if (
-      !campus ||
-      !course ||
-      !sectionTime ||
-      !fullName ||
-      !fatherName ||
-      !contact
+      !req.body.campus ||
+      !req.body.course ||
+      !req.body.sectionTime ||
+      !req.body.fullName ||
+      !req.body.fatherName ||
+      !req.body.contact
     ) {
-      return res
-        .status(400)
-        .json({ message: "Please fill all required fields", status: false });
+      return res.status(400).json({
+        message: "Please fill all required fields",
+        status: false,
+      });
     }
 
     const newStudent = await studentModel.create({
-      campus,
-      course,
-      sectionTime,
-      fullName,
-      fatherName,
-      contact,
-      email,
-      cnic,
-      gender,
-      dob,
-      qualification,
-      address,
-      city,
-      institute,
-      communityCardNumber,
-      cast,
-      community,
-      profileImage: req.file ? req.file.filename : null,
+      ...req.body,
+      profileImage: req.file?.filename || null,
+      paymentSlip: req.file?.filename || null,
     });
 
     res.status(201).json({
@@ -65,7 +30,10 @@ export const registerStudent = async (req, res) => {
       data: newStudent,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message, status: false });
+    res.status(500).json({
+      message: error.message,
+      status: false,
+    });
   }
 };
 

@@ -6,60 +6,20 @@ import mongoose from "mongoose";
 
 export const registerParticipant = async (req, res) => {
   try {
-    const {
-      event,
-      category,
-      fullName,
-      fatherName,
-      contact,
-      email,
-      cnic,
-      gender,
-      dob,
-      qualification,
-      address,
-      city,
-      institute,
-      communityCardNumber,
-      cast,
-      community,
-    } = req.body;
+    const { event, fullName, fatherName, contact, gender, dob } = req.body;
 
-    // Validation
-    if (
-      !event ||
-      !fullName ||
-      !fatherName ||
-      !contact ||
-      !cnic ||
-      !gender ||
-      !dob ||
-      !qualification ||
-      !address
-    ) {
-      return res
-        .status(400)
-        .json({ message: "Please fill all required fields", status: false });
+    // Basic validation
+    if (!event || !fullName || !fatherName || !contact || !gender || !dob) {
+      return res.status(400).json({
+        message: "Please fill all required fields",
+        status: false,
+      });
     }
 
     const newParticipant = await participantModel.create({
-      event,
-      category,
-      fullName,
-      fatherName,
-      contact,
-      email,
-      cnic,
-      gender,
-      dob,
-      qualification,
-      address,
-      city,
-      institute,
-      communityCardNumber,
-      cast,
-      community,
-      profileImage: req.file ? req.file.filename : null,
+      ...req.body,
+      profileImage: req.file?.filename || null,
+      paymentSlip: req.file?.filename || null,
     });
 
     res.status(201).json({
@@ -68,7 +28,10 @@ export const registerParticipant = async (req, res) => {
       data: newParticipant,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message, status: false });
+    res.status(500).json({
+      message: error.message,
+      status: false,
+    });
   }
 };
 
