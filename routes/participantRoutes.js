@@ -9,10 +9,15 @@ import {
   statusPaymentUpdate,
 } from "../controllers/participantController/participant.js";
 import verifyToken from "../middlewares/verifyToken.js";
+import upload from "../middlewares/uploadMiddleware.js";
 
 const router = express.Router();
 
-router.post("/add", registerParticipant);
+router.post(
+  "/add",
+  upload("event-participants/payments").single("paymentSlip"),
+  registerParticipant
+);
 router.get("/all-participant", getAllParticipant);
 router.get("/export-excel", exportParticipantData);
 router.patch(

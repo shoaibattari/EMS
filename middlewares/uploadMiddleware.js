@@ -1,46 +1,36 @@
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
-import cloudinary from "../config/cloudinary.js";
+import cloudinary from "cloudinary";
 
-// ✅ Storage setup
 const upload = (folderName) => {
   const storage = new CloudinaryStorage({
-    cloudinary,
+    cloudinary: cloudinary.v2,
     params: {
       folder: folderName,
       allowed_formats: ["jpg", "jpeg", "png"],
+      transformation: [
+        { width: 800, height: 800, crop: "limit" }, // ✅ optional optimization
+      ],
     },
   });
 
-  return multer({ storage });
+  return multer({
+    storage,
+    limits: {
+      fileSize: 2 * 1024 * 1024, // ✅ 2MB limit (screenshots ke liye perfect)
+    },
+    fileFilter: (req, file, cb) => {
+      if (
+        file.mimetype === "image/jpeg" ||
+        file.mimetype === "image/png" ||
+        file.mimetype === "image/jpg"
+      ) {
+        cb(null, true);
+      } else {
+        cb(new Error("Only JPG, JPEG, PNG images allowed"), false);
+      }
+    },
+  });
 };
 
 export default upload;
-
-// import multer from "multer";
-// import path from "path";
-
-// // ✅ Storage configuration
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, "uploads/"); // ✅ Folder jahan file store hogi
-//   },
-//   filename: function (req, file, cb) {
-//     const ext = path.extname(file.originalname);
-//     cb(null, `${Date.now()}-${file.fieldname}${ext}`);
-//   },
-// });
-
-// // ✅ File type check (sirf image)
-// const fileFilter = (req, file, cb) => {
-//   const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
-//   if (allowedTypes.includes(file.mimetype)) {
-//     cb(null, true);
-//   } else {
-//     cb(new Error("Only JPG, JPEG, PNG files allowed"), false);
-//   }
-// };
-
-// const upload = multer({ storage, fileFilter });
-
-// export default upload;
