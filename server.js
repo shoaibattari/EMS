@@ -12,7 +12,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://localhost:3000",
-      "https://omj-youtube-automation-workshop.vercel.app",
+      "https://omj-youtube-automation-course.vercel.app",
       "https://omj-swc.vercel.app",
     ], // yahan 4 URLs allow hain
   })
